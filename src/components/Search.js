@@ -1,41 +1,40 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { result } from "lodash";
 
 const Search = () => {
   const [term, setTerm] = useState("wikipedia");
+  const [debouncedTerm, setDebouncedTerm] = useState(term);
   const [results, setResults] = useState([]);
 
   useEffect(() => {
-    //use axios to make request for api, cannot use async directly on useEffect
+    const timerId = setTimeout(() => {
+      setDebouncedTerm(term);
+    }, 1000);
+
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [term]);
+
+  useEffect(() => {
     const search = async () => {
+      //NETWORK REQUESTS ARE ALWAYS ASYNC
       const { data } = await axios.get("https://en.wikipedia.org/w/api.php", {
         params: {
           action: "query",
           list: "search",
           origin: "*",
           format: "json",
-          srsearch: term || "wikipedia",
+          srsearch: debouncedTerm,
         },
       });
 
       setResults(data.query.search);
     };
+    search();
+  }, [debouncedTerm]);
 
-    if (term && !results.length) {
-      search();
-    } else {
-      const timeoutId = setTimeout(() => {
-        if (term) {
-          search();
-        }
-      }, 1000);
-
-      return () => {
-        clearTimeout(timeoutId);
-      };
-    }
-  }, [term]);
+  //use axios to make request for api, cannot use async directly on useEffect
 
   const renderedResults = results.map(result => {
     return (
