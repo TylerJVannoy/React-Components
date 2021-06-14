@@ -14,8 +14,8 @@ A reusable dropdown component
 
 ## Translate
 
-JSX and sample languages for Translation component
+JSX and sample language info for Translation component
 
 ## Convert
 
-The logic and API call for the Translation component
+Hooks and Google Translate API call for translation component
